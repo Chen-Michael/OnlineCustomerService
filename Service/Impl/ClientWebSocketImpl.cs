@@ -19,16 +19,16 @@ namespace Service.Impl
 
         public async Task Start()
         {
-            var buffer = new byte[1024 * 4];
-            WebSocketReceiveResult result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            var buffer = new Byte[1024 * 4];
+            WebSocketReceiveResult result = await WebSocket.ReceiveAsync(new ArraySegment<Byte>(buffer), CancellationToken.None);
 
             //var acceptStr = System.Text.Encoding.UTF8.GetString(buffer).Trim(char.MinValue);
 
             while (!result.CloseStatus.HasValue)
             {
-                await WebSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
+                await WebSocket.SendAsync(new ArraySegment<Byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
 
-                result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                result = await WebSocket.ReceiveAsync(new ArraySegment<Byte>(buffer), CancellationToken.None);
             }
 
             await WebSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
