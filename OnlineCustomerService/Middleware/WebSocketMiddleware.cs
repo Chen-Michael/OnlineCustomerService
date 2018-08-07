@@ -32,7 +32,7 @@ namespace OnlineCustomerService.Middleware
 
             WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
 
-            if ("/admin".Equals(context.Request.Path))
+            if ("/service".Equals(context.Request.Path))
             {
                 String token = context.Request.Query["token"];
                 manage.UserDataDecrypt(token ?? "");

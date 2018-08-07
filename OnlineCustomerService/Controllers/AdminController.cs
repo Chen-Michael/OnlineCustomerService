@@ -37,8 +37,10 @@ namespace OnlineCustomerService.Controllers
 
                 manage.data = userData;
 
+                data.Success = true;
                 data.Result = manage.UserDataEncrypt();
             }
+
             return Json(data);
         }
     }

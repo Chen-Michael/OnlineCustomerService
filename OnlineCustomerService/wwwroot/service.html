@@ -1,0 +1,65 @@
+﻿<!DOCTYPE>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link href="lib/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css" />
+    <link href="css/login.css" rel="stylesheet" />
+    <style type="text/css">
+    	.h-90{
+    		min-height: 90% !important;
+    		height: 90% !important;
+    	}
+
+    	.scrollbar-near-moon{
+    		overflow-y: auto;
+    	}
+
+    	.scrollbar-near-moon::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+		  	background-color: #F5F5F5;
+		  	border-radius: 10px; 
+		}
+
+		.scrollbar-near-moon::-webkit-scrollbar {
+		  	width: 12px;
+		  	background-color: #F5F5F5; 
+		}
+
+		.scrollbar-near-moon::-webkit-scrollbar-thumb {
+		  	border-radius: 10px;
+		  	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+		  	background-image: -webkit-gradient(linear, left bottom, left top, from(#5ee7df), to(#b490ca));
+		  	background-image: -webkit-linear-gradient(bottom, #5ee7df 0%, #b490ca 100%);
+		  	background-image: linear-gradient(to top, #5ee7df 0%, #b490ca 100%); 
+		}
+    </style>
+</head>
+<body>
+    <div class="container" style="background-color: #FFF;">
+        <div class="row h-90 scrollbar-near-moon">
+            <ul class="list-group w-100" id="message-list">
+                <li class="list-group-item">系統：連線中......</li>
+            </ul>
+        </div>
+        <div class="row">
+            &emsp;
+        </div>
+        <div class="row">
+            <div class="col-10">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="message-input" />
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="form-group text-center">
+                    <button type="button" class="btn btn-primary" id="send-button" disabled="disabled">送出</button>
+                    <button type="button" class="btn btn-danger" id="quit-button">結束</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="lib/jquery/2.2.4/jquery.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/service.js"></script>
+</body>
+</html>

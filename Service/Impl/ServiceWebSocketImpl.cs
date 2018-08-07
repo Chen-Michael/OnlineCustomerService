@@ -74,7 +74,7 @@ namespace Service.Impl
                 /* 如果有在服務用戶，拒絕此次要求 */
                 if (work)
                 {
-                    channel.BasicReject(8, true);
+                    channel.BasicReject(ea.DeliveryTag, true);
                     return;
                 }
 
@@ -120,7 +120,9 @@ namespace Service.Impl
         {
             webSocketManage.SendToService(WebSocketId, JsonConvert.SerializeObject(new { End = true }));
             SaveDialogue();
-            work = false;
+            Utils.Timer.Timer.SetTimeout(10000, delegate {
+                work = false;
+            });
         }
 
         private void AddDialogue(String message)
