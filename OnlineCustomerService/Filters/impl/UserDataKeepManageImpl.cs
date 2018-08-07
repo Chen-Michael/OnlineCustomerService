@@ -4,7 +4,7 @@ using JWT.Serializers;
 using Newtonsoft.Json;
 using System;
 
-namespace FlashPay_CardManagement.Filters.impl
+namespace OnlineCustomerService.Filters.impl
 {
     public class UserDataKeepManageImpl<T> : UserDataKeepManage<T>
     {
@@ -20,10 +20,17 @@ namespace FlashPay_CardManagement.Filters.impl
 
         public void UserDataDecrypt(String token)
         {
-            IDateTimeProvider provider = new UtcDateTimeProvider();
-            IJwtValidator validator = new JwtValidator(serializer, provider);
-            IJwtDecoder decoder = new JwtDecoder(serializer, validator, urlEncoder);
-            data = JsonConvert.DeserializeObject<T>(decoder.Decode(token, key, verify: true));
+            try
+            {
+                IDateTimeProvider provider = new UtcDateTimeProvider();
+                IJwtValidator validator = new JwtValidator(serializer, provider);
+                IJwtDecoder decoder = new JwtDecoder(serializer, validator, urlEncoder);
+                data = JsonConvert.DeserializeObject<T>(decoder.Decode(token, key, verify: true));
+            }
+            catch (Exception)
+            {
+                
+            }
         }
 
         public String UserDataEncrypt()

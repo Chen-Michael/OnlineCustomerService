@@ -11,10 +11,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OnlineCustomerService.Filters;
+using OnlineCustomerService.Filters.impl;
 using OnlineCustomerService.Middleware;
+using OnlineCustomerService.ViewModels;
+using RabbitMQ.Client;
 using Service;
 using Service.Impl;
 using StackExchange.Redis;
+using Utils.Encryption;
 
 namespace OnlineCustomerService
 {
@@ -29,13 +34,33 @@ namespace OnlineCustomerService
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
-            
+            services.AddMvc(options =>
+            {
+                //options.Filters.Add(new LoginFilter());
+            });
+
             /* 相關 DB 物件 */
             services.AddDbContext<DbContext, OnlineCustomerServiceContext>(options => options.UseSqlServer(config.GetConnectionString("MainDatabase")));
             services.AddScoped(_ => {
                 return ConnectionMultiplexer.Connect(config.GetConnectionString("MainRedis"));
             });
+
+            /* 相關 MQ 物件 */
+            ConnectionFactory factory = new ConnectionFactory() { HostName = config.GetConnectionString("MainMQ") };
+            services.AddScoped(_ => {
+                return factory.CreateConnection();
+            });
+
+            /* 相關 JWT 物件 */
+            String key = config.GetValue<String>("JWT-Key");
+            services.AddScoped<UserDataKeepManage<UserDataKeepViewModel>>(_ => {
+                return new UserDataKeepManageImpl<UserDataKeepViewModel>(key);
+            });
+
+            /* 相關 WebSocket 物件 */
+            services.AddSingleton<IWebSocketManage, WebSocketManageImpl>();
+            services.AddScoped<IServiceWebSocket, ServiceWebSocketImpl>();
+            services.AddScoped<IClientWebSocket, ClientWebSocketImpl>();
 
             /* 相關 DAO 物件 */
             services.AddScoped<IAdminDAO, AdminDAOImpl>();
@@ -43,7 +68,10 @@ namespace OnlineCustomerService
             services.AddScoped<IDialogueRecordCacheDAO, DialogueRecordCacheDAOImpl>();
 
             /* 相關 Service 物件 */
-            services.AddScoped<IClientWebSocket, ClientWebSocketImpl>();
+            services.AddScoped<IAdminService, AdminServiceImpl>();
+
+            /* 相關 Utils 物件 */
+            services.AddScoped<SHA>();
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -58,43 +86,6 @@ namespace OnlineCustomerService
             app.UseMvcWithDefaultRoute();
             app.UseWebSockets();
             app.UseWebSocketNotify();
-
-            //app.Use(async (context, next) =>
-            //{
-            //    if (context.Request.Path == "/ws")
-            //    {
-            //        if (context.WebSockets.IsWebSocketRequest)
-            //        {
-            //            WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-            //            await Echo(context, webSocket);
-            //        }
-            //        else
-            //        {
-            //            context.Response.StatusCode = 400;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        await next();
-            //    }
-
-            //});
-        }
-
-        private async Task Echo(HttpContext context, WebSocket webSocket)
-        {
-            var buffer = new byte[1024 * 4];
-            WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-
-            var acceptStr = System.Text.Encoding.UTF8.GetString(buffer).Trim(char.MinValue);
-
-            while (!result.CloseStatus.HasValue)
-            {
-                await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
-
-                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            }
-            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
         }
     }
 }

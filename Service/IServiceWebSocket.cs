@@ -4,14 +4,11 @@ using System.Threading.Tasks;
 
 namespace Service
 {
-    public interface IClientWebSocket
+    public interface IServiceWebSocket
     {
-        String Name { set; get; }
-        String Mail { set; get; }
-        String Phone { set; get; }
-        String Question { set; get; }
+        Int32 AdminId { set; get; }
         String WebSocketId { set; get; }
-        String WebSocketServiceId { set; get; }
+        String WebSocketClientId { set; get; }
         WebSocket WebSocket { set; get; }
         void Reset();
         Task Start();
